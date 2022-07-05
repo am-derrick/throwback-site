@@ -8,15 +8,20 @@ import { createPost, updatePost } from '../../actions/posts';
 
 const Form = ({ currentId, setCurrentId }) => {
   const [postData, setPostData] = useState({ creator: '', title: '', message: '', tags: '', selectedFile: '' });
-  const post = useSelector((state) => currentId ? state.posts.find((p) => p._id === currentId) : null)
+  const post = useSelector((state) => (currentId ? state.posts.find((p) => p._id === currentId) : null));
   const classes = useStyles();
   const dispatch = useDispatch();
 
   useEffect(() => {
     if(post) setPostData(post);
-  }, [post])
+  }, [post]);
 
-  const handleSubmit = (e) => {
+  const clear = () => {
+    setCurrentId(null);
+    setPostData({ creator: '', title: '', message: '', tags: '', selectedFile: '' });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if(currentId) {
@@ -26,13 +31,8 @@ const Form = ({ currentId, setCurrentId }) => {
     }
 
     clear();
-}
+};
 
-  const clear = () => {
-    setCurrentId(null);
-    setPostData({ creator: '', title: '', message: '', tags: '', selectedFile: '' });
-  }
-  
   return (
     <Paper className={classes.paper}>
       <form autoComplete='off' noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
@@ -47,7 +47,7 @@ const Form = ({ currentId, setCurrentId }) => {
           onChange={(e) => setPostData({ ...postData, message: e.target.value })}
         />
         <TextField name='tags' variant='outlined' label='Tags' fullWidth value={postData.tags}
-          onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
+          onChange={(e) => setPostData({ ...postData, tags: e.target.value.split(',') })}
         />
         <div className={classes.fileInput}>
           <FileBase type='file' multiple={false} onDone={({base64}) => setPostData({ ...postData, selectedFile: base64 })} />
